@@ -1,12 +1,16 @@
-using PlatformService.Models;
+using Common.Data;
+using Common.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace PlatformService.Data
 {
-    public abstract class Repository<T> : IRepository<T> where T : class, IModel
+    public abstract class Repository<T, TContext> : IRepository<T>
+        where T : class, IModel
+        where TContext : DbContext
     {
-        private readonly AppDbContext _context;
+        private readonly TContext _context;
 
-        public Repository(AppDbContext context)
+        public Repository(TContext context)
         {
             _context = context;
         }
@@ -24,7 +28,7 @@ namespace PlatformService.Data
             return _context.Set<T>().AsEnumerable();
         }
 
-        public virtual T GetPlatformById(int id)
+        public virtual T GetItemById(int id)
         {
             return (from x in _context.Set<T>() where x.Id == id select x).FirstOrDefault();
         }

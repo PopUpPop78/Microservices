@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlatformService.Data;
 using PlatformService.Dtos;
 using PlatformService.Models;
+using PlatformService.SyncDataServices.Http;
 
 namespace PlatformService.Controllers
 {
@@ -13,11 +14,13 @@ namespace PlatformService.Controllers
     {
         private readonly IPlatformRepository _repository;
         private readonly IMapper _mapper;
+        private readonly ICommandDataClient _commandClient;
 
-        public PlatformsController(IPlatformRepository repository, IMapper mapper)
+        public PlatformsController(IPlatformRepository repository, IMapper mapper, ICommandDataClient commandClient)
         {
             _repository = repository;
             _mapper = mapper;
+            _commandClient = commandClient;
         }
 
         [HttpGet]
@@ -38,7 +41,7 @@ namespace PlatformService.Controllers
         public ActionResult<PlatformReadDto> Get([FromRoute] int id)
         {
             Console.WriteLine($"Getting platform with id={id}");
-            var platform = _repository.GetPlatformById(id);
+            var platform = _repository.GetItemById(id);
 
             if (platform != null)
                 return Ok(_mapper.Map<PlatformReadDto>(platform));
@@ -47,12 +50,12 @@ namespace PlatformService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PlatformReadDto> Create([FromBody] PlatformAddDto platformAddDto)
+        public async Task<ActionResult<PlatformReadDto>> Create([FromBody] PlatformAddDto platformAddDto)
         {
             Console.WriteLine("Adding platform");
             if (platformAddDto == null)
             {
-                
+                return NotFound(platformAddDto);
             }
             
             var platform = _mapper.Map<Platform>(platformAddDto);
@@ -61,6 +64,15 @@ namespace PlatformService.Controllers
             _repository.SaveChanges();
 
             var platformReadDto = _mapper.Map<PlatformReadDto>(platform);
+
+            try
+            {
+                await _commandClient.SendPlatformToCommand(platformReadDto);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error occured sending to command service {ex.Message}");
+            }
             
             return CreatedAtRoute(nameof(Get), new {platformReadDto.Id}, platformReadDto);
         }

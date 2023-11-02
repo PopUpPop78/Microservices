@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PlatformService.Models
+namespace Common.Models
 {
     public interface IModel
     {
