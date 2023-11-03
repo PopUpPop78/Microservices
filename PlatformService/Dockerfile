@@ -2,17 +2,22 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 as build
 
 WORKDIR /app
 
-COPY *.csproj ./
-RUN dotnet restore
+COPY ["PlatformService/PlatformService.csproj", "PlatformService/"]
+COPY ["Common/Common.csproj", "Common/"]
+RUN dotnet restore "PlatformService/PlatformService.csproj"
 
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY . .
+WORKDIR "/app/PlatformService"
+RUN dotnet build "PlatformService.csproj" -c Release -o /app/build
+
+FROM build as publish
+RUN dotnet publish "PlatformService.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 
 WORKDIR /app
 
-COPY --from=build /app/out .
+COPY --from=publish /app/publish .
 
 ENTRYPOINT [ "dotnet", "PlatformService.dll" ]
 
