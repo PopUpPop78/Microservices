@@ -15,10 +15,26 @@ docker push <username/imagename>
 Kubernetes
 -----------
 
-kubectl version
-kubectl apply -f <pod-name>-depl.yaml
-kubectl get deployments
-kubectl get pods
-kubectl get services
-kubectl get namespace
-kubectl rollout restart deployment platforms-depl
+    General
+    ----------
+    kubectl version
+    kubectl apply -f <pod-name>-depl.yaml
+    kubectl get deployments
+    kubectl get pods
+    kubectl get services
+    kubectl get namespace
+    kubectl rollout restart deployment platforms-depl
+    kubectl get deployments --all-namespaces
+    kubectl delete -n NAMESPACE deployment DEPLOYMENT
+
+    Storage
+    ----------
+    kubectl get storageclass
+    kubectl get pvc
+
+    Secrets
+    ----------
+    kubectl create secret generic mssql --from-literal=<name>="***"
+    kubectl get secrets
+    kubectl delete secret <name>
+    kubectl describe secret <name>
