@@ -1,0 +1,24 @@
+Service was already running on port 80, in order to find out which use this
+
+netstat -ano | findstr ":80" | findstr "LISTENING"
+
+Docker
+----------
+
+docker build -t <username/imagename> .
+docker run -p 8080:80 -d <username/imagename>
+docker ps
+docker stop <container id>
+docker start <container id>
+docker push <username/imagename>
+
+Kubernetes
+-----------
+
+kubectl version
+kubectl apply -f <pod-name>-depl.yaml
+kubectl get deployments
+kubectl get pods
+kubectl get services
+kubectl get namespace
+kubectl rollout restart deployment platforms-depl
