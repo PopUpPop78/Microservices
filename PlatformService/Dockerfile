@@ -15,6 +15,10 @@ RUN dotnet publish "PlatformService.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 
+# SQL Server trusted connection problem
+RUN sed -i 's/CipherString = DEFAULT@SECLEVEL=2/CipherString = DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
+
+
 WORKDIR /app
 
 COPY --from=publish /app/publish .
