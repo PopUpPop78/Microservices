@@ -1,4 +1,3 @@
-using Common.Data;
 using PlatformService.Models;
 
 namespace PlatformService.Data
